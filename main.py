@@ -1,10 +1,10 @@
 import pygame
-#import winsound
-from tkinter import simpledialog, messagebox
+from tkinter import Tk, simpledialog, messagebox
 
 pygame.init()
 tamanho = (1000, 563)
 branco = (255, 255, 255)
+preto = (0,0,0)
 raiocirculo = 10
 clock = pygame.time.Clock()
 tela = pygame.display.set_mode(tamanho)
@@ -16,7 +16,7 @@ icon = pygame.image.load("space.png")
 pygame.display.set_icon(icon)
 som.play(-1)
 marcacoes = []
-fonte = pygame.font.SysFont("Arial", 20)
+fonte = pygame.font.SysFont("Georgia", 20)
 
 def saveMarks():
     with open("Estrelas Marcadas.txt", "w") as arquivo:
@@ -40,51 +40,63 @@ def excMarks():
 def escritasTela():
     texto_opcoes = fonte.render("Opções:", True, branco)
     texto_salvar = fonte.render("F10 - Salvar marcações", True, branco)
-    texto_carregar = fonte.render("F11 - Carregar marcações", True, branco)
+    texto_carregar = fonte.render("F11 - Carregar ultimas marcações", True, branco)
     texto_excluir = fonte.render("F12 - Excluir todas as marcações", True, branco)
     tela.blit(texto_opcoes, (10, 10))
     tela.blit(texto_salvar, (10, 40))
     tela.blit(texto_carregar, (10, 70))
     tela.blit(texto_excluir, (10, 100))
 
+def get_star_name():
+    root = Tk()
+    root.withdraw()
+    star_name = simpledialog.askstring("Nome da Estrela", "Digite o nome da estrela:")
+    if star_name is None or star_name.strip() == "":
+        star_name = "Desconhecido"
+    return star_name
 
-while True:
-    escritasTela()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            saveMarks()
+running = True
+
+while running:
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
             pygame.quit()
-            quit()
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+            saveMarks()
+        elif evento.type == pygame.KEYDOWN:
+            if evento.key == pygame.K_ESCAPE:
                 pygame.quit()
-            elif event.key == pygame.K_F10:
                 saveMarks()
-            elif event.key == pygame.K_F11:
+            elif evento.key == pygame.K_F10:
+                saveMarks()
+            elif evento.key == pygame.K_F11:
                 loadMarks()
-            elif event.key == pygame.K_F12:
-                excMarks()    
-
-        if event.type == pygame.MOUSEBUTTONDOWN:
+            elif evento.key == pygame.K_F12:
+                excMarks()
+        elif evento.type == pygame.MOUSEBUTTONUP:
             posicaomouse = pygame.mouse.get_pos()
             item = simpledialog.askstring("Space", "Nome da Estrela:")
             print(item)
             estrelas[item] = posicaomouse
             if item == "":
                 item = "Desconhecido"+str(posicaomouse)
-            estrelas[item] = posicaomouse
-    
-    for item,posicao in estrelas.items():
-        pygame.draw.circle(tela,branco,posicao,raiocirculo)
-        pygame.draw.line(tela,branco,list(estrelas.values())[0], posicao)
+            estrelas[item] = posicaomouse   
+
+    tela.blit(fundo,(0,0))        
+
+    for item,posicaos in estrelas.items():
+        pygame.draw.circle(tela,branco,posicaos,raiocirculo)
+        pygame.draw.line(tela,branco,list(estrelas.values())[0], posicaos)
         fonte = pygame.font.Font(None,20)
         texto = fonte.render(item, True,(255,255,255))
-        tela.blit(texto,(posicao[0]+10,posicao[1]+10))
+        tela.blit(texto,(posicaos[0]+10,posicaos[1]+10))
+
+
+    escritasTela()
 
     pygame.display.flip()
-    tela.fill((0,0,0))
-    tela.blit(fundo,(0,0))
-    pygame.display.flip() 
+    clock.tick(60)
+
+pygame.quit()  
             
 
 
