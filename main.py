@@ -22,17 +22,21 @@ fonte = pygame.font.SysFont("Georgia", 20)
 
 def saveMarks():
     with open("Estrelas Marcadas.txt", "w") as arquivo:
-        for posicao, nome in estrelas:
+        for nome, posicao in estrelas.items():
             arquivo.write(f"{posicao[0]},{posicao[1]},{nome}\n")
 
 def loadMarks():
     estrelas.clear()
     try:
-        with open("Estelas Marcadas.txt", "r") as arquivo:
+        with open("Estrelas Marcadas.txt", "r") as arquivo:
             for linha in arquivo:
-                x, y, nome = linha.strip().split(",")
-                posicao = (int(x), int(y))
-                marcacoes.append((posicao, nome))
+                try:
+                    x, y, nome = linha.strip().split(",")
+                    posicao = (int(x), int(y))
+                    estrelas[nome] = posicao
+                except ValueError:
+                    # Ignorar a linha inválida
+                    continue
     except FileNotFoundError:
         messagebox.showinfo("Erro", "Arquivo de marcações não encontrado.")
 
@@ -102,8 +106,6 @@ while running:
 
     for item, posicaos in estrelas.items():
         pygame.draw.circle(tela, branco, posicaos, raiocirculo)
-        # Remova a linha abaixo que conecta à primeira estrela
-        # pygame.draw.line(tela, branco, list(estrelas.values())[0], posicaos)
         fonte = pygame.font.Font(None, 20)
         texto = fonte.render(item, True, (255, 255, 255))
         tela.blit(texto, (posicaos[0] + 10, posicaos[1] + 10))
@@ -112,7 +114,6 @@ while running:
     for i in range(len(lista_estrelas) - 1):
         estrela_atual = lista_estrelas[i]
         proxima_estrela = lista_estrelas[i + 1]
-        # Verifica se não é a última marcação
         if i < len(lista_estrelas) - 2:
             pygame.draw.line(tela, branco, estrela_atual, proxima_estrela)
     
