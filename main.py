@@ -68,7 +68,6 @@ def get_star_name():
 running = True
 
 while running:
-
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             pygame.quit()
